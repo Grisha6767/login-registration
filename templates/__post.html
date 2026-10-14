@@ -1,0 +1,59 @@
+<div class="post" data-id="{{ post.id }}">
+    <a href="/user/{{ post.author.id }}" class="avatar-sm">
+        {% if post.author.avatar %}<img src="{{ post.author.avatar_url }}" alt="">
+        {% else %}{{ post.author.username[0] }}{% endif %}
+    </a>
+    <div class="post-body">
+        <div class="post-header">
+            <a class="post-author" href="/user/{{ post.author.id }}">
+                {{ post.author.username }}
+            </a>
+            <span class="post-time">{{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+            {% if post.updated_at and post.updated_at > post.created_at %}
+                <span class="edited-mark">(изменено)</span>
+            {% endif %}
+        </div>
+        <div class="post-text">{{ post.text }}</div>
+        {% if post.image %}<img src="{{ post.image_url }}" class="post-image" alt="">{% endif %}
+
+        <div class="post-actions">
+            <button class="like-btn {% if post.liked_by(me) %}liked{% endif %}"
+                    data-id="{{ post.id }}">
+                ❤️ <span class="like-count">{{ post.likes_count() }}</span>
+            </button>
+            <span>💬 <span class="comments-count">{{ post.comments|length }}</span></span>
+
+            {% if post.user_id == me.id %}
+                <button class="edit-post" data-id="{{ post.id }}">✏️ Изменить</button>
+                <button class="delete-post" data-id="{{ post.id }}">🗑 Удалить</button>
+            {% endif %}
+        </div>
+
+        <div class="comments">
+            <div class="comments-list">
+                {% for c in post.comments %}
+                    <div class="comment">
+                        <a href="/user/{{ c.author.id }}" class="avatar-sm"
+                           style="width:32px;height:32px;font-size:14px;">
+                            {% if c.author.avatar %}
+                                <img src="{{ c.author.avatar_url }}" alt="">
+                            {% else %}
+                                {{ c.author.username[0] }}
+                            {% endif %}
+                        </a>
+                        <div class="comment-body">
+                            <a class="comment-author" href="/user/{{ c.author.id }}">
+                                {{ c.author.username }}
+                            </a>
+                            <div class="comment-text">{{ c.text }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <form class="comment-form" data-id="{{ post.id }}">
+                <input type="text" maxlength="500" placeholder="Комментарий...">
+                <button type="submit" class="btn btn-secondary btn-sm">→</button>
+            </form>
+        </div>
+    </div>
+</div>

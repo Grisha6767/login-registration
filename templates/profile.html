@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мой профиль</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex;
+               justify-content: center; align-items: center; min-height: 100vh;
+               margin: 0; padding: 20px; }
+        .card { background: #fff; padding: 40px 50px; border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 420px;
+                text-align: center; }
+
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #007bff;
+                  color: #fff; font-size: 44px; font-weight: bold; display: flex;
+                  justify-content: center; align-items: center; margin: 0 auto 20px;
+                  text-transform: uppercase; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        h2 { margin: 0 0 8px; }
+        .subtitle { color: #28a745; font-weight: bold; margin-bottom: 25px; }
+
+        .bio-block { text-align: left; background: #fff8e1; border-left: 4px solid #ffc107;
+                     padding: 12px 15px; border-radius: 6px; margin-bottom: 20px;
+                     color: #555; font-size: 14px; white-space: pre-wrap; }
+
+        .info { text-align: left; background: #f8f9fa; border-radius: 8px;
+                padding: 15px 20px; margin-bottom: 25px; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0;
+                    border-bottom: 1px solid #e9ecef; }
+        .info-row:last-child { border-bottom: none; }
+        .label { color: #666; }
+        .value { font-weight: bold; color: #333; }
+
+        .btn { display: inline-block; padding: 10px 18px; border-radius: 6px;
+               text-decoration: none; font-size: 15px; margin: 3px; border: none;
+               cursor: pointer; color: #fff; font-family: inherit; }
+        .btn-primary   { background: #007bff; }
+        .btn-success   { background: #28a745; }
+        .btn-secondary { background: #6c757d; }
+        .btn-danger    { background: #dc3545; }
+        .btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="avatar">
+            {% if user.avatar %}
+                <img src="{{ user.avatar_url }}" alt="avatar">
+            {% else %}
+                {{ user.username[0] }}
+            {% endif %}
+        </div>
+
+        <h2>Привет, {{ user.username }}! 👋</h2>
+        <p class="subtitle">Вы успешно вошли в аккаунт</p>
+
+        {% if user.bio %}
+            <div class="bio-block">{{ user.bio }}</div>
+        {% endif %}
+
+        <div class="info">
+            <div class="info-row">
+                <span class="label">ID</span>
+                <span class="value">#{{ user.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Логин</span>
+                <span class="value">{{ user.username }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Постов на стене</span>
+                <span class="value">{{ user.posts|length }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Дата регистрации</span>
+                <span class="value">{{ user.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+            </div>
+        </div>
+
+        <a href="/profile/edit" class="btn btn-primary">Редактировать</a>
+        <a href="/wall" class="btn btn-success">На стену</a>
+        <a href="/users" class="btn btn-secondary">Все пользователи</a>
+        <button id="logoutBtn" class="btn btn-danger">Выйти</button>
+    </div>
+
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login-page';
+        });
+    </script>
+</body>
+</html>

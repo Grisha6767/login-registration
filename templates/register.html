@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Регистрация</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex;
+               justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #fff; padding: 30px 40px; border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 320px; }
+        h2 { text-align: center; margin-top: 0; }
+        input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box;
+                border: 1px solid #ccc; border-radius: 6px; }
+        button { width: 100%; padding: 10px; background: #28a745; color: #fff;
+                 border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #218838; }
+        .msg { text-align: center; margin-top: 15px; }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; }
+        a { display: block; text-align: center; margin-top: 15px; color: #007bff;
+            text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Регистрация</h2>
+        <form id="registerForm">
+            <input type="text" id="username" placeholder="Логин" required>
+            <input type="password" id="password" placeholder="Пароль" required>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <p id="message" class="msg"></p>
+        <a href="/login-page">Уже есть аккаунт? Войти</a>
+    </div>
+
+<script>
+    // CSRF-токен
+    const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
+    const form = document.getElementById('registerForm');
+    const msgEl = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        msgEl.textContent = '';
+        msgEl.className = 'msg';
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRF
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            msgEl.textContent = data.message;
+            msgEl.classList.add(data.ok ? 'success' : 'error');
+
+            if (data.ok) {
+                setTimeout(() => window.location.href = '/login-page', 1000);
+            }
+        } catch (err) {
+            console.error('Ошибка:', err);
+            msgEl.textContent = 'Ошибка соединения с сервером';
+            msgEl.classList.add('error');
+        }
+    });
+</script>
+</body>
+</html>
